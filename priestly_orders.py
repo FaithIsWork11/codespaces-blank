@@ -26,10 +26,9 @@ def get_current_priestly_order(current_date=None):
     return {
         "week_number": total_weeks + 1,
         "order_name": priestly_orders[index],
-        "index": index + 1
-    }
+        }
 
 # Example usage
 if __name__ == "__main__":
     current = get_current_priestly_order()
-    print(f"Week {current['week_number']}: {current['order_name']} (Order {current['index']})")
+    print(f"Week {current['week_number']}: {current['order_name']} ")

@@ -36,8 +36,28 @@ def get_enochian_date(current_date=None, calendar_type="364"):
     }
 
 def is_season_transition(day_of_year):
-    """Check if today marks a season change (based on Enoch’s 364-day: every 91 days)."""
+    """Check if today marks a season change (based on Enoch's 364-day calendar)."""
     return day_of_year in [1, 92, 183, 274]
+
+def days_until_next_season_transition(day_of_year):
+    """Calculate how many days are left until the next season transition and return a countdown."""
+    # List of season transition days and their corresponding seasons
+    season_transitions = [
+        (1, "Spring"),
+        (92, "Summer"),
+        (183, "Autumn"),
+        (274, "Winter")
+    ]
+    
+    # Find the next transition day and season
+    for transition_day, season_name in season_transitions:
+        if day_of_year < transition_day:
+            days_left = transition_day - day_of_year
+            return f"{days_left} days until {season_name}"
+    
+    # If no future transition is found, wrap around to the next year's first transition
+    days_left = 364 - day_of_year + 1
+    return f"{days_left} days until Spring"
 
 def get_season(day_of_year):
     """Return season name based on Enoch 364-day year."""
