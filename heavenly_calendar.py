@@ -88,3 +88,12 @@ def get_season(day_of_year):
         return "Autumn"
     else:
         return "Winter"
+
+def get_month_and_tribe(day_of_year):
+    """Return the month (tribe) and its index based on the day of the year."""
+    month_index = (day_of_year - 1) // 30  # Assuming 30 days per month
+    tribe = TRIBES_OF_ISRAEL[month_index % len(TRIBES_OF_ISRAEL)]
+    return {
+        "month_index": month_index + 1,  # 1-based index for months
+        "tribe": tribe
+    }

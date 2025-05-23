@@ -4,6 +4,7 @@ from astral.sun import sun
 import heavenly_calendar as calendar        # renamed module
 import priestly_orders  # your priestly_orders.py
 import angelic_parts  # your angelic_parts.py
+from celestial_correspondences import CELESTIAL_GATES  # New celestial gates module
 
 # Define the names of the 12 tribes of Israel
 TRIBES_OF_ISRAEL = [
@@ -29,35 +30,45 @@ class Timekeeper:
             # Nighttime: from sunset to the next day's sunrise
             next_sunrise = sun(self.location.observer, date=self.current_date + timedelta(days=1))["sunrise"]
             total_night_minutes = (next_sunrise - sunset).total_seconds() / 60
-            part_duration = total_night_minutes / 18
+            part_duration = total_night_minutes / 9  # 9 parts for night
             minutes_since_sunset = (self.current_date - sunset).total_seconds() / 60
             part_index = int(minutes_since_sunset // part_duration) + 1
             if part_index > len(angelic_parts.night_parts):
                 raise IndexError("Part index out of range for night_parts.")
             part_info = angelic_parts.night_parts[part_index - 1]
+            celestial_gate = self.get_celestial_gate(part_index)
             return {
                 "period": "Night",
                 "part": part_index,
                 "angel": part_info["angel"],
                 "role": part_info["role"],
                 "prayer": part_info["prayer"],
+                "celestial_gate": celestial_gate
             }
         else:
             # Daytime: from sunrise to sunset
             total_day_minutes = (sunset - sunrise).total_seconds() / 60
-            part_duration = total_day_minutes / 18
+            part_duration = total_day_minutes / 9  # 9 parts for day
             minutes_since_sunrise = (self.current_date - sunrise).total_seconds() / 60
             part_index = int(minutes_since_sunrise // part_duration) + 1
             if part_index > len(angelic_parts.day_parts):
                 raise IndexError("Part index out of range for day_parts.")
             part_info = angelic_parts.day_parts[part_index - 1]
+            celestial_gate = self.get_celestial_gate(part_index)
             return {
                 "period": "Day",
                 "part": part_index,
                 "angel": part_info["angel"],
                 "role": part_info["role"],
                 "prayer": part_info["prayer"],
+                "celestial_gate": celestial_gate
             }
+
+    def get_celestial_gate(self, part_index):
+        """Retrieve celestial gate information based on the current part index."""
+        if 1 <= part_index <= len(CELESTIAL_GATES):
+            return CELESTIAL_GATES[part_index - 1]
+        raise ValueError(f"Invalid part index {part_index}. Must be between 1 and 18.")
 
     def get_time_data(self):
         enochian_date = calendar.get_enochian_date(self.current_date)
