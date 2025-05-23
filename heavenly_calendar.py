@@ -9,6 +9,12 @@ DAYS_IN_YEAR_364 = 364
 DAYS_IN_YEAR_360 = 360
 DAYS_IN_WEEK = 7
 
+# Define the names of the 12 tribes of Israel
+TRIBES_OF_ISRAEL = [
+    "Reuben", "Simeon", "Levi", "Judah", "Dan", "Naphtali",
+    "Gad", "Asher", "Issachar", "Zebulun", "Joseph", "Benjamin"
+]
+
 def get_days_since_creation(current_date=None):
     """Returns total days since creation."""
     if not current_date:
@@ -16,8 +22,13 @@ def get_days_since_creation(current_date=None):
     # Both current_date and CREATION_DATE are timezone-aware now
     return (current_date - CREATION_DATE).days
 
+def get_tribe_for_month(day_of_year):
+    """Return the tribe name corresponding to the current month."""
+    month_index = (day_of_year - 1) // 30  # Assuming 30 days per month
+    return TRIBES_OF_ISRAEL[month_index % len(TRIBES_OF_ISRAEL)]
+
 def get_enochian_date(current_date=None, calendar_type="364"):
-    """Returns current year, day of year, and week (based on 364 or 360-day calendar)."""
+    """Returns current year, day of year, week, and tribe (based on 364 or 360-day calendar)."""
     days_since_creation = get_days_since_creation(current_date)
 
     if calendar_type == "360":
@@ -28,11 +39,13 @@ def get_enochian_date(current_date=None, calendar_type="364"):
         day_of_year = days_since_creation % DAYS_IN_YEAR_364 + 1
 
     week = (day_of_year - 1) // DAYS_IN_WEEK + 1
+    tribe = get_tribe_for_month(day_of_year)
 
     return {
         "year": year,
         "day_of_year": day_of_year,
-        "week": week
+        "week": week,
+        "tribe": tribe
     }
 
 def is_season_transition(day_of_year):
@@ -53,11 +66,17 @@ def days_until_next_season_transition(day_of_year):
     for transition_day, season_name in season_transitions:
         if day_of_year < transition_day:
             days_left = transition_day - day_of_year
-            return f"{days_left} days until {season_name}"
+            return {
+                "days_left": days_left,
+                "next_season": season_name
+            }
     
     # If no future transition is found, wrap around to the next year's first transition
     days_left = 364 - day_of_year + 1
-    return f"{days_left} days until Spring"
+    return {
+        "days_left": days_left,
+        "next_season": "Spring"
+    }
 
 def get_season(day_of_year):
     """Return season name based on Enoch 364-day year."""
