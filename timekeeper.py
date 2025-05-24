@@ -15,7 +15,7 @@ TRIBES_OF_ISRAEL = [
 class Timekeeper:
     def __init__(self, current_date=None, location=None):
         self.current_date = current_date or datetime.now(timezone.utc)
-        self.location = location or LocationInfo("New York", "USA", "America/New_York", 40.7128, -74.0060)
+        self.location = location or LocationInfo("Cap-Haïtien", "Haiti", None, 19.7594, -72.2042)
 
     def get_sun_times(self):
         """Calculate sunrise and sunset times for the current date and location."""
@@ -25,6 +25,18 @@ class Timekeeper:
     def get_enochian_part_of_day_with_angel(self):
         """Calculate the current part of the day or night based on 18 parts."""
         sunrise, sunset = self.get_sun_times()
+
+        # Convert times to UTC-5
+        utc_minus_5 = timezone(timedelta(hours=-5))
+        current_time_utc_minus_5 = self.current_date.astimezone(utc_minus_5)
+        sunrise_utc_minus_5 = sunrise.astimezone(utc_minus_5)
+        sunset_utc_minus_5 = sunset.astimezone(utc_minus_5)
+
+        # Debugging output
+        print(f"Current time (UTC): {self.current_date}")
+        print(f"Current time (UTC-5): {current_time_utc_minus_5}")
+        print(f"Sunrise (UTC): {sunrise}, Sunset (UTC): {sunset}")
+        print(f"Sunrise (UTC-5): {sunrise_utc_minus_5}, Sunset (UTC-5): {sunset_utc_minus_5}")
 
         if self.current_date < sunrise or self.current_date >= sunset:
             # Nighttime: from sunset to the next day's sunrise
@@ -43,7 +55,10 @@ class Timekeeper:
                 "angel": part_info["angel"],
                 "role": part_info["role"],
                 "prayer": part_info["prayer"],
-                "celestial_gate": celestial_gate
+                "celestial_gate": celestial_gate,
+                "current_time_utc_minus_5": current_time_utc_minus_5.strftime("%Y-%m-%d %H:%M:%S"),
+                "sunrise_utc_minus_5": sunrise_utc_minus_5.strftime("%Y-%m-%d %H:%M:%S"),
+                "sunset_utc_minus_5": sunset_utc_minus_5.strftime("%Y-%m-%d %H:%M:%S"),
             }
         else:
             # Daytime: from sunrise to sunset
@@ -61,7 +76,10 @@ class Timekeeper:
                 "angel": part_info["angel"],
                 "role": part_info["role"],
                 "prayer": part_info["prayer"],
-                "celestial_gate": celestial_gate
+                "celestial_gate": celestial_gate,
+                "current_time_utc_minus_5": current_time_utc_minus_5.strftime("%Y-%m-%d %H:%M:%S"),
+                "sunrise_utc_minus_5": sunrise_utc_minus_5.strftime("%Y-%m-%d %H:%M:%S"),
+                "sunset_utc_minus_5": sunset_utc_minus_5.strftime("%Y-%m-%d %H:%M:%S"),
             }
 
     def get_celestial_gate(self, part_index):
@@ -76,20 +94,20 @@ class Timekeeper:
         day_of_year = enochian_date["day_of_year"]
         week = enochian_date["week"]
         season = calendar.get_season(day_of_year)
-        
+
         # Determine the month (tribe) based on the day of the year
         month_index = (day_of_year - 1) // 30  # Assuming 30 days per month
         month_name = TRIBES_OF_ISRAEL[month_index % len(TRIBES_OF_ISRAEL)]
-        
+
         # Check if today is a season transition
         print(f"Day of Year: {day_of_year}")
         is_transition = calendar.is_season_transition(day_of_year)
         print(f"Is Season Transition: {is_transition}")
-        
+
         # Get countdown to the next season transition
         countdown = calendar.days_until_next_season_transition(day_of_year)
         print(f"Countdown to next season transition: {countdown}")
-        
+
         # Use priestly_orders with current date for accurate calculation
         priestly = priestly_orders.get_current_priestly_order(self.current_date)
 
